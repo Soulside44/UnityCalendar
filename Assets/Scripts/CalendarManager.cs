@@ -8,6 +8,7 @@ public class CalendarManager : MonoBehaviour
 {
     [SerializeField] GameObject dateCellPrefab;
     [SerializeField] RectTransform dateContent;
+    [SerializeField] Button prevMonthButton;
     [SerializeField] Text yearText;
     [SerializeField] Text monthText;
 
@@ -21,6 +22,7 @@ public class CalendarManager : MonoBehaviour
         dateTime = DateTime.Now;
         CreateDateCell();
         SetDate();
+        SetMonth();
     }
     void CreateDateCell()
     {
@@ -29,9 +31,8 @@ public class CalendarManager : MonoBehaviour
             DateCell dateCell = Instantiate(dateCellPrefab, dateContent).GetComponent<DateCell>();
             dateCells.Add(dateCell);
         }
-        dateTime = DateTime.Now;
         //yearText.text = dateTime.Year.ToString();
-        monthText.text = dateTime.Month.ToString(00+"월");
+        
     }
     int GetDays(DayOfWeek day)
     {
@@ -67,28 +68,53 @@ public class CalendarManager : MonoBehaviour
                 }
             }
         }
+        
     }
     public void YearPrev()
     {
+        ClearCell();
         dateTime = dateTime.AddYears(-1);
         CreateDateCell();
+        SetDate();
+        SetMonth();
     }
 
     public void YearNext()
     {
+        ClearCell();
         dateTime = dateTime.AddYears(1);
         CreateDateCell();
+        SetDate();
+        SetMonth();
     }
 
     public void MonthPrev()
     {
+        ClearCell();
         dateTime = dateTime.AddMonths(-1);
         CreateDateCell();
+        SetDate();
+        SetMonth();
     }
 
     public void MonthNext()
     {
+        ClearCell();
         dateTime = dateTime.AddMonths(1);
         CreateDateCell();
+        SetDate();
+        SetMonth();
+    }
+    public void ClearCell()
+    {
+        foreach(DateCell dateCell in dateCells)
+        {
+            Destroy(dateCell.gameObject);
+        }
+        dateCells.Clear();
+    }
+    public void SetMonth()
+    {
+        monthText.text = dateTime.Month.ToString(00 + "월");
     }
 }
