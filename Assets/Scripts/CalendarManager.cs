@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
+using System.Globalization;
 
 public class CalendarManager : MonoBehaviour
 {
@@ -115,6 +116,6 @@ public class CalendarManager : MonoBehaviour
     }
     public void SetMonth()
     {
-        monthText.text = dateTime.Month.ToString(00 + "월");
+        monthText.text = dateTime.ToString("MMMM", CultureInfo.GetCultureInfo("en"));
     }
 }
