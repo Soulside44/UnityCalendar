@@ -5,25 +5,38 @@ using UnityEngine.UI;
 using System;
 using System.Globalization;
 
-public class CalendarManager : MonoBehaviour
+public class CalendarViewManager : ViewManager
 {
     [SerializeField] GameObject dateCellPrefab;
     [SerializeField] RectTransform dateContent;
-    [SerializeField] Button prevMonthButton;
-    [SerializeField] Text yearText;
-    [SerializeField] Text monthText;
-
+    public delegate void reNewYearMonth(string year, string month);
+    public reNewYearMonth reNewYearMonthDelegate;
     public List<DateCell> dateCells = new List<DateCell>();
     const int maxDate = 42;
     DateTime dateTime;
 
     // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
         dateTime = DateTime.Now;
         CreateDateCell();
         SetDate();
-        SetMonth();
+        SetYearMonth();
+
+        leftNavgationViewButton = Instantiate(leftButtonPrefab).GetComponent<PlannerButton>();
+        leftNavgationViewButton.SetOnClickAction(() =>
+        {
+            MonthPrev();
+        });
+        rightNavgationViewButton = Instantiate(rightButtonPrefab).GetComponent<PlannerButton>();
+        rightNavgationViewButton.SetOnClickAction(() =>
+        {
+            MonthNext();
+        });
+    }
+    private void Start()
+    {
+
     }
     void CreateDateCell()
     {
@@ -31,9 +44,7 @@ public class CalendarManager : MonoBehaviour
         {
             DateCell dateCell = Instantiate(dateCellPrefab, dateContent).GetComponent<DateCell>();
             dateCells.Add(dateCell);
-        }
-        //yearText.text = dateTime.Year.ToString();
-        
+        }    
     }
     int GetDays(DayOfWeek day)
     {
@@ -62,9 +73,8 @@ public class CalendarManager : MonoBehaviour
                 DateTime thatDay = firstDay.AddDays(date);
                 if (thatDay.Month == firstDay.Month)
                 {
-                    Text label = dateCells[i].date;
                     dateCells[i].gameObject.SetActive(true);
-                    label.text = (date + 1).ToString();
+                    dateCells[i].dateText.text = (date + 1).ToString();
                     date++;
                 }
             }
@@ -77,7 +87,7 @@ public class CalendarManager : MonoBehaviour
         dateTime = dateTime.AddYears(-1);
         CreateDateCell();
         SetDate();
-        SetMonth();
+        SetYearMonth();
     }
 
     public void YearNext()
@@ -86,7 +96,7 @@ public class CalendarManager : MonoBehaviour
         dateTime = dateTime.AddYears(1);
         CreateDateCell();
         SetDate();
-        SetMonth();
+        SetYearMonth();
     }
 
     public void MonthPrev()
@@ -95,7 +105,7 @@ public class CalendarManager : MonoBehaviour
         dateTime = dateTime.AddMonths(-1);
         CreateDateCell();
         SetDate();
-        SetMonth();
+        SetYearMonth();
     }
 
     public void MonthNext()
@@ -104,7 +114,7 @@ public class CalendarManager : MonoBehaviour
         dateTime = dateTime.AddMonths(1);
         CreateDateCell();
         SetDate();
-        SetMonth();
+        SetYearMonth();
     }
     public void ClearCell()
     {
@@ -114,8 +124,10 @@ public class CalendarManager : MonoBehaviour
         }
         dateCells.Clear();
     }
-    public void SetMonth()
+    public void SetYearMonth()
     {
-        monthText.text = dateTime.ToString("MMMM", CultureInfo.GetCultureInfo("en"));
+        monthTitle = dateTime.ToString("MMMM", CultureInfo.GetCultureInfo("en"));
+        yearTitle = dateTime.ToString("yyyy", CultureInfo.GetCultureInfo("en"));
+        reNewYearMonthDelegate?.Invoke(yearTitle, monthTitle);
     }
 }
